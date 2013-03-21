@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CheckpointManager</class>
+ <widget class="QMainWindow" name="CheckpointManager">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>295</width>
+    <height>281</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Checkpoint Manager</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Add new entrant time</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblNode">
+           <property name="text">
+            <string>Checkpoint Number</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="inptNode"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblCheckpointType">
+           <property name="text">
+            <string>Checkpoint Type:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblEntrant">
+           <property name="text">
+            <string>Entrant:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="inptEntrant"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblArrival">
+           <property name="text">
+            <string>Arrival Time:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QTimeEdit" name="inptArrivalTime"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblEntrantExcluded">
+           <property name="text">
+            <string>Entrant Excluded: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="inptExcluded">
+           <item>
+            <property name="text">
+             <string>No</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Yes</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="lblDTime">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Departure Time:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QTimeEdit" name="inptDTime"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="lblCheckpointValue">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblNote">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+      <zorder>label</zorder>
+      <zorder>comboBox</zorder>
+      <zorder>gridLayoutWidget</zorder>
+      <zorder>lblArrival</zorder>
+      <zorder>lblNote</zorder>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>inptNode</tabstop>
+  <tabstop>inptEntrant</tabstop>
+  <tabstop>inptArrivalTime</tabstop>
+  <tabstop>inptExcluded</tabstop>
+  <tabstop>inptDTime</tabstop>
+  <tabstop>comboBox_3</tabstop>
+  <tabstop>comboBox_2</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>inptNode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>CheckpointManager</receiver>
+   <slot>checkpointChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>217</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>300</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>checkpointChanged(int)</slot>
+ </slots>
+</ui>
