@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         checkpointmanager.cpp \
     node.cpp \
-    entrant.cpp
+    entrant.cpp \
+    course.cpp
 
 HEADERS  += checkpointmanager.h \
     node.h \
-    entrant.h
+    entrant.h \
+    course.h
 
 FORMS    += checkpointmanager.ui

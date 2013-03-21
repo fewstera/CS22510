@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>295</width>
-    <height>281</height>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,6 +43,13 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="lblCheckpointValue">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QLabel" name="lblEntrant">
            <property name="text">
@@ -61,7 +68,15 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QTimeEdit" name="inptArrivalTime"/>
+          <widget class="QTimeEdit" name="inptArrivalTime">
+           <property name="time">
+            <time>
+             <hour>0</hour>
+             <minute>0</minute>
+             <second>0</second>
+            </time>
+           </property>
+          </widget>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="lblEntrantExcluded">
@@ -97,10 +112,10 @@
          <item row="6" column="1">
           <widget class="QTimeEdit" name="inptDTime"/>
          </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="lblCheckpointValue">
+         <item row="7" column="1">
+          <widget class="QPushButton" name="inptSubmit">
            <property name="text">
-            <string/>
+            <string>Submit</string>
            </property>
           </widget>
          </item>
@@ -111,14 +126,15 @@
          <property name="text">
           <string/>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignHCenter|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
-      <zorder>label</zorder>
-      <zorder>comboBox</zorder>
-      <zorder>gridLayoutWidget</zorder>
-      <zorder>lblArrival</zorder>
-      <zorder>lblNote</zorder>
      </widget>
     </item>
    </layout>
@@ -132,8 +148,6 @@
   <tabstop>inptArrivalTime</tabstop>
   <tabstop>inptExcluded</tabstop>
   <tabstop>inptDTime</tabstop>
-  <tabstop>comboBox_3</tabstop>
-  <tabstop>comboBox_2</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -149,12 +163,63 @@
     </hint>
     <hint type="destinationlabel">
      <x>187</x>
-     <y>300</y>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inptEntrant</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>CheckpointManager</receiver>
+   <slot>entrantChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>241</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inptExcluded</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>CheckpointManager</receiver>
+   <slot>entrantExcludedChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>359</x>
+     <y>231</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inptSubmit</sender>
+   <signal>clicked()</signal>
+   <receiver>CheckpointManager</receiver>
+   <slot>submitPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>205</x>
+     <y>240</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>283</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>checkpointChanged(int)</slot>
+  <slot>entrantChanged()</slot>
+  <slot>entrantExcludedChanged()</slot>
+  <slot>submitPressed()</slot>
  </slots>
 </ui>
