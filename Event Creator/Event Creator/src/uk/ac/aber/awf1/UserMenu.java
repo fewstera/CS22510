@@ -22,13 +22,15 @@ import java.util.regex.Pattern;
  * @author fewstera
  */
 class UserMenu {
-    
+    private ArrayList<Track> tracks = new ArrayList<Track>();
     private ArrayList<Node> nodes = new ArrayList<Node>();
     private LinkedList<Event> events = new LinkedList<Event>();
 
+    
     public UserMenu(){
         System.out.println("Welcome to the event creation system.");    
         loadNodesFile();
+        loadTracksFile();
         topLevelMenu();
     }
     
@@ -53,7 +55,45 @@ class UserMenu {
         }
         
     }
+    
+    private void loadTracksFile(){
+        System.out.print("\n\nPlease enter the location of the tracks file: "); 
+        String tracksFile = "/Users/fewstera/Documents/CS22510/data/extended/tracks.txt";
+        System.out.println(tracksFile + "\n");
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(tracksFile));
+            String line;
+            while((line = br.readLine()) != null) {
+                String[] stringParts = line.split(" ");
+                Node to, from;
+                to = getNode(Integer.parseInt(stringParts[1]));
+                from = getNode(Integer.parseInt(stringParts[2]));
+                if((to==null)||(from==null)){
+                    System.out.println("\n\nError parsing tracks file, exiting."); 
+                    System.exit(0);
+                }
+                tracks.add(new Track(to, from));
+            }
+            System.out.println("\n\nLoaded Successfully!"); 
+        } catch (FileNotFoundException ex) {
+            System.out.print("\n\nThe file you entered was not found please try again."); 
+            loadNodesFile();
+        } catch (IOException ex) {
+            System.out.println("\n\nError reading file exiting."); 
+            System.exit(0);
+        }
+        
+    }
 
+    private Node getNode(int id) {
+        for(Node node : nodes){
+            if(node.getId()==id){
+                return node;
+            }
+        }
+        return null;
+    }
+    
     private void topLevelMenu() {
         System.out.println("\n\nMain Menu\n"
                 + "=============================================\n"
@@ -92,6 +132,7 @@ class UserMenu {
             default:
                 System.out.println("\n\nERROR: Unexpected input, please enter only the number of your selection. Please try again");
                 topLevelMenu(); //Unexpected output, try again
+                break;
 
         }
         
@@ -105,10 +146,10 @@ class UserMenu {
                 + "Enter the event name: ");
         
         Scanner in = new Scanner(System.in);
-        eventName = in.next();
+        eventName = in.nextLine();
         
         System.out.print("Enter the event date:  ");
-        eventDate = in.next();
+        eventDate = in.nextLine();
         
         boolean correctTime = false;
         while(!correctTime){
@@ -122,7 +163,7 @@ class UserMenu {
                 System.out.print("\n\nError incorrect time, try again\n\n");
             }
         }
-        events.add(new Event(eventName, eventDate, timeString));
+        events.add(new Event(this, eventName, eventDate, timeString));
         System.out.print("\n\nEvent created successfully!");
         topLevelMenu();
 
@@ -174,7 +215,17 @@ class UserMenu {
         }
         if((selection>0)&&(selection<count)){
             events.get(selection-1).listOptions();
-        }   
+        }
     }
+
+    public ArrayList<Track> getTracks() {
+        return tracks;
+    }
+
+    public ArrayList<Node> getNodes() {
+        return nodes;
+    }
+    
+    
 
 }
