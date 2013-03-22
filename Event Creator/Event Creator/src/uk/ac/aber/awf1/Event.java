@@ -236,4 +236,27 @@ class Event {
         }
     }
     
+    public String generateEventFile(){
+        return getName() + "\n" + getDate() + "\n" + getTimeString();
+    }
+    
+        
+    public String generateCoursesFile(){
+        String returnString = "";
+        for(Course course: courses){
+            returnString = returnString + course.toFormatedString() + "\n";
+        }
+        return returnString;
+    }
+    
+    public String generateEntrantsFile(){
+        String returnString = "";
+        int count = 1;
+        for(Entrant entrant: entrants){
+            returnString = returnString + count + " " + entrant.toFormatedString() + "\n";
+            count++;
+        }
+        return returnString;
+    }
+    
 }

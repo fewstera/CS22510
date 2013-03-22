@@ -27,5 +27,7 @@ class Entrant {
         return name;
     }
    
-   
+    public String toFormatedString(){
+        return getCourse().getId() + " " + getName();
+    }
 }

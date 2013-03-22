@@ -58,7 +58,7 @@ class Course {
                 listOptions();
                 break;
             case 2:
-                //modifyCourse();
+                removeNode();
                 listOptions();
                 break;
             case 3:
@@ -123,6 +123,32 @@ class Course {
             }
         }
     }
+
+    private void removeNode() {
+        if(nodes.size()==0){
+            System.out.print("\n\nThere isn't any nodes to remove");
+        }else{
+            System.out.print("\n\nRemove a node\n"
+                + "=============================================\n"
+                + "Please select from the following options\n"
+                + "1. Remove first node\n"
+                + "2. Remove last node\n"
+                + "3. Cancel");
+            int selection;
+            try { //Attempt to receive keyboard input from user
+                Scanner in = new Scanner(System.in);
+                selection = in.nextInt();
+            } catch (InputMismatchException IO) {
+                System.out.print("\n\nInvalid input. Returning to modify course page");
+                selection = 3; //Invalid user input so set selection to count
+            }
+            if(selection==1){
+                nodes.removeFirst();
+            }else if(selection==2){
+                nodes.removeLast();
+            }
+        }
+    }
     
     private ArrayList<Node> availableNodes(){
         ArrayList<Node> returnList = new ArrayList<Node>();
@@ -135,5 +161,13 @@ class Course {
             }
         }
         return returnList;
+    }
+    
+    public String toFormatedString(){
+        String returnString = getId() + " " + nodes.size();
+        for(Node node: nodes){
+            returnString =  returnString + " " + node.getId();
+        }
+        return returnString;
     }
 }

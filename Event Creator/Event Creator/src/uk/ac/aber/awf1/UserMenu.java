@@ -7,13 +7,18 @@
 package uk.ac.aber.awf1;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,6 +132,10 @@ class UserMenu {
                 removeEvent();
                 topLevelMenu();
                 break;
+            case 4:
+                generateFiles();
+                topLevelMenu();
+                break;
             case 5:
                 break;
             default:
@@ -224,6 +233,46 @@ class UserMenu {
 
     public ArrayList<Node> getNodes() {
         return nodes;
+    }
+
+    private void generateFiles() {
+        System.out.println("\n\nGenerate Event Files\n"
+                + "=============================================\n"
+                + "Directory to save files to: ");
+        Scanner in = new Scanner(System.in);
+
+        String directoryPath = in.nextLine();
+        System.out.println("\"" + directoryPath + "\"");
+        File file = new File(directoryPath);
+
+        if (file.isDirectory()) {
+            for(Event event:events){
+                String eventFolderPath = directoryPath + File.separator + event.getName();
+                (new File(eventFolderPath)).mkdirs();
+
+                File eventFile = new File(eventFolderPath + File.separator + "event.txt"); 
+                File coursesFile = new File(eventFolderPath + File.separator + "courses.txt"); 
+                File entrantsFile = new File(eventFolderPath + File.separator + "entrants.txt"); 
+
+                try { 
+                    DataOutputStream eventFileOuts = new DataOutputStream(new FileOutputStream(eventFile, false));
+                    DataOutputStream coursesFileOuts = new DataOutputStream(new FileOutputStream(coursesFile, false));
+                    DataOutputStream entrantsFileOuts = new DataOutputStream(new FileOutputStream(entrantsFile, false));
+                    eventFileOuts.write(event.generateEventFile().getBytes());
+                    coursesFileOuts.write(event.generateCoursesFile().getBytes());
+                    entrantsFileOuts.write(event.generateEntrantsFile().getBytes());
+                    
+                } catch (IOException ex) {
+                    System.out.println("Unable to create event files. Quiting");
+                    System.exit(0);
+                }
+
+            }
+            System.out.println("\n\nSaved files successfully!");
+        } else {
+            System.out.println("\n\nThis is not a directory, please try again");
+            generateFiles();
+        }
     }
     
     
