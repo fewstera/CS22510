@@ -1,5 +1,5 @@
 /*
- * event class
+ * Event class
  * 
  * Responsible for handling all actions on an event
  * 
@@ -22,7 +22,8 @@ class Event {
     private LinkedList<Entrant> entrants = new LinkedList<Entrant>();
     private UserMenu userMenu;
     
-    Event(UserMenu userMenu, String eventName, String eventDate, String eventTimeString){
+    Event(UserMenu userMenu, String eventName, 
+            String eventDate, String eventTimeString){
         this.userMenu = userMenu;
         this.name = eventName;
         this.date = eventDate;
@@ -61,7 +62,8 @@ class Event {
             selection = 0; //Invalid user input so set selection to 0
         }
         
-        //Switch case to determine the users selection, and call the appropiate method.
+        //Switch case to determine the users 
+        //selection, and call the appropiate method.
         switch (selection) {
             case 1:
                 addNewCourse();
@@ -86,7 +88,8 @@ class Event {
             case 6:
                 break;
             default:
-                System.out.println("\n\n\nERROR: Unexpected input, please enter only the number of your selection. Please try again");
+                System.out.println("\n\n\nERROR: Unexpected input, please enter"
+                        + " only the number of your selection. Please try again");
                 listOptions(); //Unexpected output, try again
                 break;
 
@@ -104,7 +107,9 @@ class Event {
             if(getCourse(letter)==null){
                 courses.add(new Course(userMenu, letter));
             }else{
-                System.out.print("\n\nA course already exists with this prefix. try again");
+                System.out.print("\n\nA course already exists with "
+                        + ""
+                        + "this prefix. try again");
                 addNewCourse();  
             }
         }else{
@@ -150,7 +155,8 @@ class Event {
 
     private void addEntrant() {
         if(courses.size()==0){
-            System.out.print("\n\nYou must have atleast one course before you can add entrants");
+            System.out.print("\n\nYou must have atleast one course "
+                    + "before you can add entrants");
         }else{
             String entrantName;
             Course entrantCourse = null;
@@ -236,11 +242,12 @@ class Event {
         }
     }
     
+    //Gnerate the text for an event file
     public String generateEventFile(){
         return getName() + "\n" + getDate() + "\n" + getTimeString();
     }
     
-        
+    //Generates the text for a course file
     public String generateCoursesFile(){
         String returnString = "";
         for(Course course: courses){
@@ -249,11 +256,13 @@ class Event {
         return returnString;
     }
     
+    //Generates the text for an entrants file
     public String generateEntrantsFile(){
         String returnString = "";
         int count = 1;
         for(Entrant entrant: entrants){
-            returnString = returnString + count + " " + entrant.toFormatedString() + "\n";
+            returnString = returnString + count + " "
+                    + "" + entrant.toFormatedString() + "\n";
             count++;
         }
         return returnString;

@@ -1,7 +1,7 @@
 /*
  * Course class
  * 
- * This class represents a course
+ * This model represents a course in an event
  * 
  */
 package uk.ac.aber.awf1;
@@ -51,7 +51,6 @@ class Course {
             selection = 0; //Invalid user input so set selection to 0
         }
         
-        //Switch case to determine the users selection, and call the appropiate method.
         switch (selection) {
             case 1:
                 addNode();
@@ -64,7 +63,9 @@ class Course {
             case 3:
                 break;
             default:
-                System.out.println("\n\n\nERROR: Unexpected input, please enter only the number of your selection. Please try again");
+                System.out.println("\n\n\nERROR: Unexpected input, please enter"
+                        + " only the number of your selection. "
+                        + "Please try again");
                 listOptions(); //Unexpected output, try again
                 break;
 
@@ -88,7 +89,8 @@ class Course {
                 Scanner in = new Scanner(System.in);
                 selection = in.nextInt();
             } catch (InputMismatchException IO) {
-                System.out.print("\n\nInvalid input. Returning to modify course page");
+                System.out.print("\n\nInvalid input. Returning to modify "
+                        + "course page");
                 selection = count; //Invalid user input so set selection to count
             }
             if((selection>0)&&(selection<count)){
@@ -98,7 +100,8 @@ class Course {
         }else{
             System.out.println("\n\nAdd an extra node\n"
                 + "=============================================\n"
-                + "Below is a list of nodes linked to the last node (" + nodes.getLast().getId() + "). \n"
+                + "Below is a list of nodes linked to the "
+                    + "last node (" + nodes.getLast().getId() + "). \n"
                     + "Select which node you would like to add to the list.\n");
             
             int count = 0;
@@ -114,7 +117,8 @@ class Course {
                 Scanner in = new Scanner(System.in);
                 selection = in.nextInt();
             } catch (InputMismatchException IO) {
-                System.out.print("\n\nInvalid input. Returning to modify course page");
+                System.out.print("\n\nInvalid input. Returning to modify "
+                        + "course page");
                 selection = count; //Invalid user input so set selection to count
             }
             if((selection>0)&&(selection<count)){
@@ -139,7 +143,8 @@ class Course {
                 Scanner in = new Scanner(System.in);
                 selection = in.nextInt();
             } catch (InputMismatchException IO) {
-                System.out.print("\n\nInvalid input. Returning to modify course page");
+                System.out.print("\n\nInvalid input. Returning to modify "
+                        + "course page");
                 selection = 3; //Invalid user input so set selection to count
             }
             if(selection==1){

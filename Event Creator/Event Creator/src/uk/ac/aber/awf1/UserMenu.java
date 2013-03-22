@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,18 +39,20 @@ class UserMenu {
     
     private void loadNodesFile(){
         System.out.print("\n\nPlease enter the location of the nodes file: "); 
-        String nodesFile = "/Users/fewstera/Documents/CS22510/data/extended/nodes.txt";
-        System.out.println(nodesFile + "\n");
+        Scanner in = new Scanner(System.in);
+        String nodesFile = in.nextLine();
         try{
             BufferedReader br = new BufferedReader(new FileReader(nodesFile));
             String line;
             while((line = br.readLine()) != null) {
                 String[] stringParts = line.split(" ");
-                nodes.add(new Node(Integer.parseInt(stringParts[0]), stringParts[1]));
+                nodes.add(new 
+                        Node(Integer.parseInt(stringParts[0]), stringParts[1]));
             }
             System.out.println("\n\nLoaded Successfully!"); 
         } catch (FileNotFoundException ex) {
-            System.out.print("\n\nThe file you entered was not found please try again."); 
+            System.out.print("\n\nThe file you entered was not found "
+                    + "please try again."); 
             loadNodesFile();
         } catch (IOException ex) {
             System.out.println("\n\nError reading file exiting."); 
@@ -63,8 +63,8 @@ class UserMenu {
     
     private void loadTracksFile(){
         System.out.print("\n\nPlease enter the location of the tracks file: "); 
-        String tracksFile = "/Users/fewstera/Documents/CS22510/data/extended/tracks.txt";
-        System.out.println(tracksFile + "\n");
+        Scanner in = new Scanner(System.in);
+        String tracksFile = in.nextLine();
         try{
             BufferedReader br = new BufferedReader(new FileReader(tracksFile));
             String line;
@@ -81,8 +81,9 @@ class UserMenu {
             }
             System.out.println("\n\nLoaded Successfully!"); 
         } catch (FileNotFoundException ex) {
-            System.out.print("\n\nThe file you entered was not found please try again."); 
-            loadNodesFile();
+            System.out.print("\n\nThe file you entered was not found "
+                    + "please try again."); 
+            loadTracksFile();
         } catch (IOException ex) {
             System.out.println("\n\nError reading file exiting."); 
             System.exit(0);
@@ -119,7 +120,8 @@ class UserMenu {
             selection = 0; //Invalid user input so set selection to 0
         }
         
-        //Switch case to determine the users selection, and call the appropiate method.
+        //Switch case to determine the users selection, and call the appropiate 
+        //method.
         switch (selection) {
             case 1:
                 createNewEvent();
@@ -139,7 +141,8 @@ class UserMenu {
             case 5:
                 break;
             default:
-                System.out.println("\n\nERROR: Unexpected input, please enter only the number of your selection. Please try again");
+                System.out.println("\n\nERROR: Unexpected input, please enter "
+                        + "only the number of your selection. Please try again");
                 topLevelMenu(); //Unexpected output, try again
                 break;
 
@@ -242,22 +245,33 @@ class UserMenu {
         Scanner in = new Scanner(System.in);
 
         String directoryPath = in.nextLine();
-        System.out.println("\"" + directoryPath + "\"");
         File file = new File(directoryPath);
-
+        //Check the entered text is a directory
         if (file.isDirectory()) {
             for(Event event:events){
-                String eventFolderPath = directoryPath + File.separator + event.getName();
-                (new File(eventFolderPath)).mkdirs();
+                String eventFolderPath = 
+                        directoryPath + File.separator + event.getName();
+                (new File(eventFolderPath)).mkdirs(); 
+                //Make new DIRs for each event
 
-                File eventFile = new File(eventFolderPath + File.separator + "event.txt"); 
-                File coursesFile = new File(eventFolderPath + File.separator + "courses.txt"); 
-                File entrantsFile = new File(eventFolderPath + File.separator + "entrants.txt"); 
+                File eventFile = new 
+                        File(eventFolderPath + File.separator + "event.txt"); 
+                File coursesFile = new 
+                        File(eventFolderPath + File.separator + "courses.txt"); 
+                File entrantsFile = new 
+                        File(eventFolderPath + File.separator + "entrants.txt"); 
 
                 try { 
-                    DataOutputStream eventFileOuts = new DataOutputStream(new FileOutputStream(eventFile, false));
-                    DataOutputStream coursesFileOuts = new DataOutputStream(new FileOutputStream(coursesFile, false));
-                    DataOutputStream entrantsFileOuts = new DataOutputStream(new FileOutputStream(entrantsFile, false));
+                    //Write to all the files
+                    DataOutputStream eventFileOuts = 
+                            new DataOutputStream(new 
+                            FileOutputStream(eventFile, false));
+                    DataOutputStream coursesFileOuts = 
+                            new DataOutputStream(new
+                            FileOutputStream(coursesFile, false));
+                    DataOutputStream entrantsFileOuts = 
+                            new DataOutputStream(new 
+                            FileOutputStream(entrantsFile, false));
                     eventFileOuts.write(event.generateEventFile().getBytes());
                     coursesFileOuts.write(event.generateCoursesFile().getBytes());
                     entrantsFileOuts.write(event.generateEntrantsFile().getBytes());

@@ -259,9 +259,11 @@ void get_log_file_path(){
     }
 }
 
+//Adds a new message to the log
 void add_to_log(const char* message){    
     
     FILE* log_file = fopen(log_file_path, "a+");
+    //Locks the log file while we write
     flock(fileno(log_file),LOCK_EX);
     time_t now;
     time(&now);
@@ -270,9 +272,10 @@ void add_to_log(const char* message){
     time_t t = time(NULL);
     struct tm * p = localtime(&t);
 
+    //Formats the time string
     strftime(s, 1000, "[%A, %B %d %Y at %I:%M]", p);
     fprintf(log_file,"%s %s\n", s, message);
-    
+    //Unlocks the log file
     flock(fileno(log_file),LOCK_UN);
     fclose(log_file);
 }

@@ -1,7 +1,7 @@
 /*
  * Entrant class
  * 
- * This class represents an entrant
+ * This model represents an entrant on the course
  * 
  */
 package uk.ac.aber.awf1;

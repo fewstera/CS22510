@@ -25,19 +25,23 @@ CheckpointManager::CheckpointManager(QWidget *parent) :
     this->coursesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/courses.txt";
     this->timesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/new.txt";
 
+    //Parse the needed files for an event
     parseNodesFile();
     parseCoursesFile();
     parseEntrantsFile();
     parseTimesFile();
 
+    //Load nodes and entrant's into the combobox
     loadNodes();
     loadEntrants();
 
     hideElements();
 
+    //Resize window to the smallest size without ruining content
     resize(sizeHint());
 }
 
+//Hides and resets all UI elements
 void CheckpointManager::hideElements(){
     ui->lblCheckpointType->setVisible(false);
     ui->lblCheckpointValue->setVisible(false);
@@ -63,26 +67,33 @@ void CheckpointManager::hideElements(){
     this->currentState = 0;
 }
 
+//Loads Nodes into the inptNode Combobox
 void CheckpointManager::loadNodes(){
     ui->inptNode->clear();
     ui->inptNode->addItem("Select a checkpoint", QVariant(-1));
     for(vector<Node>::iterator node = nodes.begin(); node!=nodes.end(); ++node){
+        //Add the node to the combobox and set QVariant to help indentify the node
         ui->inptNode->addItem(QString::number((*node).getNumber()), QVariant((*node).getNumber()));
     }
 }
 
+//Loads entrants into the inpEntrant Combobox
 void CheckpointManager::loadEntrants(){
     ui->inptEntrant->addItem("Select an entrant", QVariant(-1));
     for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
+        //Add the entrant to the combobox and set QVariant to help indentify the node
         ui->inptEntrant->addItem(QString((*entrant).getName().c_str()), QVariant((*entrant).getId()));
     }
 }
 
+//Called when inptNode's value is chnaged (E.g. a new node is selected)
 void CheckpointManager::checkpointChanged(int index){
     int nodeNumber = ui->inptNode->itemData(index).toInt();
     if(nodeNumber == -1){
+        //If its been set to the place holder, hide all elements
         hideElements();
     }else{
+        //Determine node type
         if(getNode(nodeNumber)->getIsMedical()){
             ui->lblCheckpointValue->setText(QString("Medical checkpoint"));
         }else{
@@ -96,7 +107,7 @@ void CheckpointManager::checkpointChanged(int index){
     resize(sizeHint());
 }
 
-
+//Called when inptEntant's index is changed
 void CheckpointManager::entrantChanged(){
     hideElements();
 
@@ -116,11 +127,14 @@ void CheckpointManager::entrantChanged(){
             Node * node = this->getNode(nodeId);
 
             ui->lblArrival->setVisible(true);
+            //Set default arrival time to now, to help user
             ui->inptArrivalTime->setTime(QTime::currentTime());
             ui->inptArrivalTime->setVisible(true);
 
             if((*entrant).nextNode()->getNumber()==(*node).getNumber()){
+                //If entrant is on the right route
                 if((*node).getIsMedical()){
+                    //If medical checkpoint, show medial info
                     ui->lblEntrantExcluded->setVisible(true);
                     ui->inptExcluded->setVisible(true);
 
@@ -130,10 +144,12 @@ void CheckpointManager::entrantChanged(){
                     ui->inptDTime->setVisible(true);
                     this->currentState = 2;
                 }else{
+                    //Set the time of Dtime to current time to help user
                     ui->inptDTime->setTime(QTime::currentTime());
                     this->currentState = 1;
                 }
             }else{
+                //Entrant has gone the wrong way
                 ui->lblNote->setText(QString("Note: This entrant will be excluded for going the wrong way"));
                 ui->lblNote->setVisible(true);
                 this->currentState = 3;
@@ -141,27 +157,33 @@ void CheckpointManager::entrantChanged(){
 
             ui->inptSubmit->setVisible(true);
         }else{
+            //Remove null pointer's
             ui->inptEntrant->removeItem(ui->inptEntrant->currentIndex());
         }
     }
     resize(sizeHint());
 }
 
+//Called when the entrantExcluded combobox is changed.
 void CheckpointManager::entrantExcludedChanged(){
     if(ui->inptExcluded->currentIndex()==1){
+        //Show label
         ui->lblNote->setText(QString("Note: This entrant will be excluded for medical reasons"));
         ui->lblNote->setVisible(true);
     }else{
+        //Hide label
         ui->lblNote->setVisible(false);
     }
     resize(sizeHint());
 }
 
-
+//Called when submit is pressed. In charge of saving to file
 void CheckpointManager::submitPressed(){
+    //Open time file
     int fd = open(timesFilePath.c_str(), O_RDWR);
     struct flock fl;
     if (fd == -1) {
+        //Change for file descriptor lock
         QMessageBox msgBox;
         msgBox.setText("Error!");
         msgBox.setInformativeText("The times file is currently being used by someone else, please wait and try submit again.");
@@ -173,7 +195,7 @@ void CheckpointManager::submitPressed(){
         fl.l_whence = SEEK_SET;
         fl.l_start = 100;
         fl.l_len = 10;
-
+        //Check if file is currently locked
         if (fcntl(fd, F_SETLK, &fl) == -1) {
             if (errno == EACCES || errno == EAGAIN) {
                 QMessageBox msgBox;
@@ -189,6 +211,7 @@ void CheckpointManager::submitPressed(){
                 msgBox.exec();
             }
         } else {
+            //Open file for appending
             FILE* timesFileToWrite = fopen(timesFilePath.c_str(), "a+");
 
             int entrantId = ui->inptEntrant->itemData(ui->inptEntrant->currentIndex()).toInt();
@@ -202,6 +225,7 @@ void CheckpointManager::submitPressed(){
             if(this->currentState==1){
                 fprintf(timesFileToWrite,"T %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
             }
+            //Medical Checkpoint
             if(this->currentState==2){
                 QTime dTime = ui->inptDTime->time();
                 fprintf(timesFileToWrite,"A %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
@@ -210,6 +234,7 @@ void CheckpointManager::submitPressed(){
                 else
                     fprintf(timesFileToWrite,"E %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
             }
+            //Excluded
             if(this->currentState==3){
                 fprintf(timesFileToWrite,"I %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
             }
@@ -219,7 +244,7 @@ void CheckpointManager::submitPressed(){
             fl.l_whence = SEEK_SET;
             fl.l_start = 100;
             fl.l_len = 10;
-
+            //Unlock file
             if (fcntl(fd, F_SETLK, &fl) == -1){
                 QMessageBox msgBox;
                 msgBox.setText("Error!");
@@ -232,6 +257,7 @@ void CheckpointManager::submitPressed(){
                 msgBox.setInformativeText("The entrant time has been added.");
                 msgBox.exec();
 
+                //Reset all elements so we can add another time.
                 hideElements();
                 parseTimesFile();
                 ui->inptEntrant->setCurrentIndex(0);
@@ -245,6 +271,7 @@ void CheckpointManager::submitPressed(){
 
 }
 
+//Returns a node points from a node id
 Node * CheckpointManager::getNode(int nodeNumber){
     for(vector<Node>::iterator node = nodes.begin(); node!=nodes.end(); ++node){
         if((*node).getNumber()==nodeNumber)
@@ -253,6 +280,7 @@ Node * CheckpointManager::getNode(int nodeNumber){
     return NULL;
 }
 
+//Returns a course pointer from a courseId
 Course * CheckpointManager::getCourse(string courseId){
     for(vector<Course>::iterator course = courses.begin(); course!=courses.end(); ++course){
         if((*course).getId().compare(courseId)==0)
@@ -261,6 +289,7 @@ Course * CheckpointManager::getCourse(string courseId){
     return NULL;
 }
 
+//Returns an entrant from an entrantId
 Entrant * CheckpointManager::getEntrant(int id){
     for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
         if((*entrant).getId()==id)
@@ -269,12 +298,15 @@ Entrant * CheckpointManager::getEntrant(int id){
     return NULL;
 }
 
+//Resets an entrant
 void CheckpointManager::resetEntrants(){
     for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
         (*entrant).reset();
     }
 }
 
+
+//Removes an entrant from the list and comobox when theyre no longer needed
 void CheckpointManager::removeEntrant(int id){
     for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
         int entrantId = (*entrant).getId();
@@ -287,7 +319,7 @@ void CheckpointManager::removeEntrant(int id){
 }
 
 
-//Load Files
+//Parsenodes file
 void CheckpointManager::parseNodesFile(){
     ifstream nodesFile(nodesFilePath.c_str(), ios::in);
 
@@ -314,6 +346,8 @@ void CheckpointManager::parseNodesFile(){
     nodesFile.close();
 }
 
+
+//Parse entrants file
 void CheckpointManager::parseEntrantsFile(){
     ifstream entrantsFile(entrantsFilePath.c_str(), ios::in);
 
@@ -340,6 +374,7 @@ void CheckpointManager::parseEntrantsFile(){
     entrantsFile.close();
 }
 
+//Parse courses file
 void CheckpointManager::parseCoursesFile(){
     ifstream coursesFile(coursesFilePath.c_str(), ios::in);
 
@@ -363,10 +398,13 @@ void CheckpointManager::parseCoursesFile(){
             Course* newCourse = new Course(courseId);
             string nodeNo;
             for(int i = 0; i<(intNoNodes); i++){
+                //If not the last node, look for ' ' delimineters
                 if(i<(intNoNodes-1))
                     getline(coursesFile, nodeNo, ' ');
                 else
                     getline(coursesFile, nodeNo);
+                    //Last node, so just read till read of line
+
                 Node* nodeToAdd = getNode(atoi(nodeNo.c_str()));
                 if(nodeToAdd!=NULL){
                     (*newCourse).addCheckpoint(nodeToAdd);
@@ -378,6 +416,7 @@ void CheckpointManager::parseCoursesFile(){
     coursesFile.close();
 }
 
+//Parses a times file
 void CheckpointManager::parseTimesFile(){
     resetEntrants();
 
@@ -398,6 +437,7 @@ void CheckpointManager::parseTimesFile(){
 
         while(timesFile){
             string nodeType, nodeId, entrantId, time;
+            //Read information from the line
             getline(timesFile, nodeType, ' ');
             getline(timesFile, nodeId, ' ');
             getline(timesFile, entrantId, ' ');
@@ -409,6 +449,7 @@ void CheckpointManager::parseTimesFile(){
                     if(entrant!=NULL){
                         (*entrant).incrementVisitedNodes();
                         if((*entrant).nextNode()==NULL){
+                            //Remove finished/excluded entrants
                             removeEntrant((*entrant).getId());
                         }
                     }

@@ -1,7 +1,7 @@
 /*
  * Track class
  * 
- * This class represents a Track
+ * This model represents a Track on a course
  * 
  */
 package uk.ac.aber.awf1;
