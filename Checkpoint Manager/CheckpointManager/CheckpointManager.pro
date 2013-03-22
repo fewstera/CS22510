@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-03-20T15:15:02
+# Project created by QtCreator 2013-03-22T08:56:31
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = CheckpointManager
+TARGET = NewCheckpointManager
 TEMPLATE = app
 
 

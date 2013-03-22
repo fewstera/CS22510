@@ -15,14 +15,15 @@
 using namespace std;
 
 CheckpointManager::CheckpointManager(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::CheckpointManager){
+    QWidget(parent),
+    ui(new Ui::CheckpointManager)
+{
+    ui->setupUi(this);
+
     this->nodesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/nodes.txt";
     this->entrantsFilePath = "/Users/fewstera/Documents/CS22510/data/extended/entrants.txt";
     this->coursesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/courses.txt";
     this->timesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/new.txt";
-
-    ui->setupUi(this);
 
     parseNodesFile();
     parseCoursesFile();
@@ -199,18 +200,18 @@ void CheckpointManager::submitPressed(){
 
             //Time checkpoint
             if(this->currentState==1){
-                fprintf(timesFileToWrite,"\nT %d %d %d:%d", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                fprintf(timesFileToWrite,"T %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
             }
             if(this->currentState==2){
                 QTime dTime = ui->inptDTime->time();
-                fprintf(timesFileToWrite,"\nA %d %d %d:%d", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                fprintf(timesFileToWrite,"A %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
                 if(ui->inptExcluded->currentIndex()==0)
-                    fprintf(timesFileToWrite,"\nD %d %d %d:%d", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
+                    fprintf(timesFileToWrite,"D %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
                 else
-                    fprintf(timesFileToWrite,"\nE %d %d %d:%d", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
+                    fprintf(timesFileToWrite,"E %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
             }
             if(this->currentState==3){
-                fprintf(timesFileToWrite,"\nI %d %d %d:%d", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                fprintf(timesFileToWrite,"I %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
             }
             fclose(timesFileToWrite);
 
@@ -394,15 +395,10 @@ void CheckpointManager::parseTimesFile(){
         }
         newfile.close();
     }else{
-        QMessageBox msgBox;
-         msgBox.setText("Error!");
-         msgBox.setInformativeText("Error parsing times file. The program will now exit.");
-         msgBox.setIcon(QMessageBox::Critical);
-         msgBox.exec();
+
         while(timesFile){
             string nodeType, nodeId, entrantId, time;
             getline(timesFile, nodeType, ' ');
-            cout << "NodeType: " << nodeType << "\n\n";
             getline(timesFile, nodeId, ' ');
             getline(timesFile, entrantId, ' ');
             getline(timesFile, time);
@@ -416,8 +412,7 @@ void CheckpointManager::parseTimesFile(){
                             removeEntrant((*entrant).getId());
                         }
                     }
-                }else if((nodeType.compare("I")==0)||(nodeType.compare("E")==0)){
-                    cout << "Removing: " << intEntrantId;
+                }else if((nodeType.compare("I")==0)&&(nodeType.compare("E")==0)){
                     removeEntrant(intEntrantId);
                 }
             }
