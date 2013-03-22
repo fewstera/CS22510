@@ -1,7 +1,7 @@
 #ifndef CHECKPOINTMANAGER_H
 #define CHECKPOINTMANAGER_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include "node.h"
 #include "entrant.h"
 #include "course.h"
@@ -10,10 +10,10 @@ namespace Ui {
 class CheckpointManager;
 }
 
-class CheckpointManager : public QMainWindow
+class CheckpointManager : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     explicit CheckpointManager(QWidget *parent = 0);
     std::string nodesFilePath;
