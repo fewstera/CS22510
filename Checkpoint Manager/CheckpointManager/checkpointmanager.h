@@ -54,4 +54,8 @@ private:
     std::vector<Course> courses;
 };
 
+/*
+ * Strut for file locking
+*/
+
 #endif // CHECKPOINTMANAGER_H

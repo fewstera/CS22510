@@ -4,6 +4,13 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <stdio.h>
+
+#include <iostream>
 
 using namespace std;
 
@@ -104,33 +111,37 @@ void CheckpointManager::entrantChanged(){
         int nodeId = ui->inptNode->itemData(ui->inptNode->currentIndex()).toInt();
 
         Entrant * entrant = this->getEntrant(entrantId);
-        Node * node = this->getNode(nodeId);
+        if(entrant != NULL){
+            Node * node = this->getNode(nodeId);
 
-        ui->lblArrival->setVisible(true);
-        ui->inptArrivalTime->setTime(QTime::currentTime());
-        ui->inptArrivalTime->setVisible(true);
+            ui->lblArrival->setVisible(true);
+            ui->inptArrivalTime->setTime(QTime::currentTime());
+            ui->inptArrivalTime->setVisible(true);
 
-        if((*entrant).nextNode()->getNumber()==(*node).getNumber()){
-            if((*node).getIsMedical()){
-                ui->lblEntrantExcluded->setVisible(true);
-                ui->inptExcluded->setVisible(true);
+            if((*entrant).nextNode()->getNumber()==(*node).getNumber()){
+                if((*node).getIsMedical()){
+                    ui->lblEntrantExcluded->setVisible(true);
+                    ui->inptExcluded->setVisible(true);
 
-                ui->lblNote->setVisible(true);
+                    ui->lblNote->setVisible(true);
 
-                ui->lblDTime->setVisible(true);
-                ui->inptDTime->setVisible(true);
-                this->currentState = 2;
+                    ui->lblDTime->setVisible(true);
+                    ui->inptDTime->setVisible(true);
+                    this->currentState = 2;
+                }else{
+                    ui->inptDTime->setTime(QTime::currentTime());
+                    this->currentState = 1;
+                }
             }else{
-                ui->inptDTime->setTime(QTime::currentTime());
-                this->currentState = 1;
+                ui->lblNote->setText(QString("Note: This entrant will be excluded for going the wrong way"));
+                ui->lblNote->setVisible(true);
+                this->currentState = 3;
             }
-        }else{
-            ui->lblNote->setText(QString("Note: This entrant will be excluded for going the wrong way"));
-            ui->lblNote->setVisible(true);
-            this->currentState = 3;
-        }
 
-        ui->inptSubmit->setVisible(true);
+            ui->inptSubmit->setVisible(true);
+        }else{
+            ui->inptEntrant->removeItem(ui->inptEntrant->currentIndex());
+        }
     }
     resize(sizeHint());
 }
@@ -145,8 +156,92 @@ void CheckpointManager::entrantExcludedChanged(){
     resize(sizeHint());
 }
 
+
 void CheckpointManager::submitPressed(){
-    //
+    int fd = open(timesFilePath.c_str(), O_RDWR);
+    struct flock fl;
+    if (fd == -1) {
+        QMessageBox msgBox;
+        msgBox.setText("Error!");
+        msgBox.setInformativeText("The times file is currently being used by someone else, please wait and try submit again.");
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+    }else{
+
+        fl.l_type = F_WRLCK;
+        fl.l_whence = SEEK_SET;
+        fl.l_start = 100;
+        fl.l_len = 10;
+
+        if (fcntl(fd, F_SETLK, &fl) == -1) {
+            if (errno == EACCES || errno == EAGAIN) {
+                QMessageBox msgBox;
+                msgBox.setText("Error!");
+                msgBox.setInformativeText("The times file is currently being used by someone else, please wait and try submit again.");
+                msgBox.setIcon(QMessageBox::Critical);
+                msgBox.exec();
+            } else {
+                QMessageBox msgBox;
+                msgBox.setText("Error!");
+                msgBox.setInformativeText("Unexpected file error, try again.");
+                msgBox.setIcon(QMessageBox::Critical);
+                msgBox.exec();
+            }
+        } else {
+            FILE* timesFileToWrite = fopen(timesFilePath.c_str(), "a+");
+
+            int entrantId = ui->inptEntrant->itemData(ui->inptEntrant->currentIndex()).toInt();
+            int nodeId = ui->inptNode->itemData(ui->inptNode->currentIndex()).toInt();
+
+            Entrant * entrant = this->getEntrant(entrantId);
+            Node * node = this->getNode(nodeId);
+            QTime arrivalTime = ui->inptArrivalTime->time();
+
+            //Time checkpoint
+            if(this->currentState==1){
+                fprintf(timesFileToWrite,"\nT %d %d %d:%d", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+            }
+            if(this->currentState==2){
+                QTime dTime = ui->inptDTime->time();
+                fprintf(timesFileToWrite,"\nA %d %d %d:%d", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                if(ui->inptExcluded->currentIndex()==0)
+                    fprintf(timesFileToWrite,"\nD %d %d %d:%d", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
+                else
+                    fprintf(timesFileToWrite,"\nE %d %d %d:%d", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
+            }
+            if(this->currentState==3){
+                fprintf(timesFileToWrite,"\nI %d %d %d:%d", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+            }
+            fclose(timesFileToWrite);
+
+            fl.l_type = F_UNLCK;
+            fl.l_whence = SEEK_SET;
+            fl.l_start = 100;
+            fl.l_len = 10;
+
+            if (fcntl(fd, F_SETLK, &fl) == -1){
+                QMessageBox msgBox;
+                msgBox.setText("Error!");
+                msgBox.setInformativeText("Unexpected error while unlocking file");
+                msgBox.setIcon(QMessageBox::Critical);
+                msgBox.exec();
+            }else{
+                QMessageBox msgBox;
+                msgBox.setText("Time added successfully!");
+                msgBox.setInformativeText("The entrant time has been added.");
+                msgBox.exec();
+
+                hideElements();
+                parseTimesFile();
+                ui->inptEntrant->setCurrentIndex(0);
+                ui->inptNode->setCurrentIndex(0);
+                entrants.empty();
+                parseEntrantsFile();
+                parseTimesFile();
+            }
+        }
+    }
+
 }
 
 Node * CheckpointManager::getNode(int nodeNumber){
@@ -215,6 +310,7 @@ void CheckpointManager::parseNodesFile(){
             nodes.push_back(Node(nodeNo, isMedical));
         }
     }
+    nodesFile.close();
 }
 
 void CheckpointManager::parseEntrantsFile(){
@@ -240,6 +336,7 @@ void CheckpointManager::parseEntrantsFile(){
             entrants.push_back(Entrant(entrantIdNo, entrantName, entrantCourse));
         }
     }
+    entrantsFile.close();
 }
 
 void CheckpointManager::parseCoursesFile(){
@@ -277,6 +374,7 @@ void CheckpointManager::parseCoursesFile(){
             this->courses.push_back((*newCourse));
         }
     }
+    coursesFile.close();
 }
 
 void CheckpointManager::parseTimesFile(){
@@ -285,32 +383,37 @@ void CheckpointManager::parseTimesFile(){
     ifstream timesFile(timesFilePath.c_str());
 
     if (!timesFile){
-        QMessageBox msgBox;
-         msgBox.setText("Error!");
-         msgBox.setInformativeText("Error parsing times file. The program will now exit.");
-         msgBox.setIcon(QMessageBox::Critical);
-         msgBox.exec();
-         exit (EXIT_FAILURE);
-    }
+        std::ofstream newfile (timesFilePath.c_str(), ios::in);
+        if(!newfile.is_open()){
+            QMessageBox msgBox;
+             msgBox.setText("Error!");
+             msgBox.setInformativeText("Error parsing times file. The program will now exit.");
+             msgBox.setIcon(QMessageBox::Critical);
+             msgBox.exec();
+             exit (EXIT_FAILURE);
+        }
+        newfile.close();
+    }else{
 
-    while(timesFile){
-        string nodeType, nodeId, entrantId, time;
-        getline(timesFile, nodeType, ' ');
-        getline(timesFile, nodeId, ' ');
-        getline(timesFile, entrantId, ' ');
-        getline(timesFile, time);
-        if(!nodeType.empty()){
-            int intEntrantId = atoi(entrantId.c_str());
-            if((nodeType.compare("T")==0)||(nodeType.compare("D")==0)){
-                Entrant * entrant = getEntrant(intEntrantId);
-                if(entrant!=NULL){
-                    (*entrant).incrementVisitedNodes();
-                    if((*entrant).nextNode()==NULL){
-                        removeEntrant((*entrant).getId());
+        while(timesFile){
+            string nodeType, nodeId, entrantId, time;
+            getline(timesFile, nodeType, ' ');
+            getline(timesFile, nodeId, ' ');
+            getline(timesFile, entrantId, ' ');
+            getline(timesFile, time);
+            if(!nodeType.empty()){
+                int intEntrantId = atoi(entrantId.c_str());
+                if((nodeType.compare("T")==0)||(nodeType.compare("D")==0)){
+                    Entrant * entrant = getEntrant(intEntrantId);
+                    if(entrant!=NULL){
+                        (*entrant).incrementVisitedNodes();
+                        if((*entrant).nextNode()==NULL){
+                            removeEntrant((*entrant).getId());
+                        }
                     }
+                }else if(nodeType.compare("I")==0){
+                    removeEntrant(intEntrantId);
                 }
-            }else if(nodeType.compare("I")==0){
-                removeEntrant(intEntrantId);
             }
         }
     }
