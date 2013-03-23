@@ -29,7 +29,8 @@ public slots:
     void submitPressed();
 
 private:
-    int currentState; //Current state of the form (0 unfinished, 1 time, 2 medical, 3 excluded)
+    int currentState; //Current state of the form (0 unfinished, 1 time, 
+    //2 medical, 3 excluded)
 
     void loadNodes();
     void loadEntrants();

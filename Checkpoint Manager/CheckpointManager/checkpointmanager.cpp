@@ -19,11 +19,12 @@ CheckpointManager::CheckpointManager(QWidget *parent) :
     ui(new Ui::CheckpointManager)
 {
     ui->setupUi(this);
+    QStringList cmdline_args = QCoreApplication::arguments();
 
-    this->nodesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/nodes.txt";
-    this->entrantsFilePath = "/Users/fewstera/Documents/CS22510/data/extended/entrants.txt";
-    this->coursesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/courses.txt";
-    this->timesFilePath = "/Users/fewstera/Documents/CS22510/data/extended/new.txt";
+    this->nodesFilePath = cmdline_args.at(1).toStdString();
+    this->entrantsFilePath = cmdline_args.at(2).toStdString();
+    this->coursesFilePath = cmdline_args.at(3).toStdString();
+    this->timesFilePath = cmdline_args.at(4).toStdString();
 
     //Parse the needed files for an event
     parseNodesFile();
@@ -73,16 +74,20 @@ void CheckpointManager::loadNodes(){
     ui->inptNode->addItem("Select a checkpoint", QVariant(-1));
     for(vector<Node>::iterator node = nodes.begin(); node!=nodes.end(); ++node){
         //Add the node to the combobox and set QVariant to help indentify the node
-        ui->inptNode->addItem(QString::number((*node).getNumber()), QVariant((*node).getNumber()));
+        ui->inptNode->addItem(
+        QString::number((*node).getNumber()), QVariant((*node).getNumber()));
     }
 }
 
 //Loads entrants into the inpEntrant Combobox
 void CheckpointManager::loadEntrants(){
     ui->inptEntrant->addItem("Select an entrant", QVariant(-1));
-    for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
-        //Add the entrant to the combobox and set QVariant to help indentify the node
-        ui->inptEntrant->addItem(QString((*entrant).getName().c_str()), QVariant((*entrant).getId()));
+    for(vector<Entrant>::iterator entrant = 
+            entrants.begin(); entrant!=entrants.end(); ++entrant){
+        //Add the entrant to the combobox and set QVariant to help indentify 
+        //the node
+        ui->inptEntrant->addItem(QString((*entrant).getName().c_str()),
+                QVariant((*entrant).getId()));
     }
 }
 
@@ -117,7 +122,8 @@ void CheckpointManager::entrantChanged(){
     ui->lblEntrant->setVisible(true);
     ui->inptEntrant->setVisible(true);
 
-    int entrantId = ui->inptEntrant->itemData(ui->inptEntrant->currentIndex()).toInt();
+    int entrantId = 
+    ui->inptEntrant->itemData(ui->inptEntrant->currentIndex()).toInt();
     if(entrantId != -1){
         parseTimesFile();
         int nodeId = ui->inptNode->itemData(ui->inptNode->currentIndex()).toInt();
@@ -150,7 +156,8 @@ void CheckpointManager::entrantChanged(){
                 }
             }else{
                 //Entrant has gone the wrong way
-                ui->lblNote->setText(QString("Note: This entrant will be excluded for going the wrong way"));
+                ui->lblNote->setText(QString("Note: This entrant will be "
+                "excluded for going the wrong way"));
                 ui->lblNote->setVisible(true);
                 this->currentState = 3;
             }
@@ -168,7 +175,8 @@ void CheckpointManager::entrantChanged(){
 void CheckpointManager::entrantExcludedChanged(){
     if(ui->inptExcluded->currentIndex()==1){
         //Show label
-        ui->lblNote->setText(QString("Note: This entrant will be excluded for medical reasons"));
+        ui->lblNote->setText(QString("Note: This entrant will be excluded for "
+        "medical reasons"));
         ui->lblNote->setVisible(true);
     }else{
         //Hide label
@@ -186,7 +194,8 @@ void CheckpointManager::submitPressed(){
         //Change for file descriptor lock
         QMessageBox msgBox;
         msgBox.setText("Error!");
-        msgBox.setInformativeText("The times file is currently being used by someone else, please wait and try submit again.");
+        msgBox.setInformativeText("The times file is currently being used by "
+        "someone else, please wait and try submit again.");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
     }else{
@@ -200,7 +209,9 @@ void CheckpointManager::submitPressed(){
             if (errno == EACCES || errno == EAGAIN) {
                 QMessageBox msgBox;
                 msgBox.setText("Error!");
-                msgBox.setInformativeText("The times file is currently being used by someone else, please wait and try submit again.");
+                msgBox.setInformativeText("The times file is "
+                "currently being used by someone else, please wait "
+                "and try submit again.");
                 msgBox.setIcon(QMessageBox::Critical);
                 msgBox.exec();
             } else {
@@ -214,8 +225,10 @@ void CheckpointManager::submitPressed(){
             //Open file for appending
             FILE* timesFileToWrite = fopen(timesFilePath.c_str(), "a+");
 
-            int entrantId = ui->inptEntrant->itemData(ui->inptEntrant->currentIndex()).toInt();
-            int nodeId = ui->inptNode->itemData(ui->inptNode->currentIndex()).toInt();
+            int entrantId = 
+            ui->inptEntrant->itemData(ui->inptEntrant->currentIndex()).toInt();
+            int nodeId =
+            ui->inptNode->itemData(ui->inptNode->currentIndex()).toInt();
 
             Entrant * entrant = this->getEntrant(entrantId);
             Node * node = this->getNode(nodeId);
@@ -223,20 +236,29 @@ void CheckpointManager::submitPressed(){
 
             //Time checkpoint
             if(this->currentState==1){
-                fprintf(timesFileToWrite,"T %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                fprintf(timesFileToWrite,"T %d %d %02i:%02i\n", 
+                        node->getNumber(), entrant->getId(), arrivalTime.hour(), 
+                        arrivalTime.minute());
             }
             //Medical Checkpoint
             if(this->currentState==2){
                 QTime dTime = ui->inptDTime->time();
-                fprintf(timesFileToWrite,"A %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                fprintf(timesFileToWrite,"A %d %d %02i:%02i\n", node->getNumber(),
+                        entrant->getId(), arrivalTime.hour(), 
+                        arrivalTime.minute());
                 if(ui->inptExcluded->currentIndex()==0)
-                    fprintf(timesFileToWrite,"D %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
+                    fprintf(timesFileToWrite,"D %d %d %02i:%02i\n", 
+                            node->getNumber(), entrant->getId(), dTime.hour(), 
+                            dTime.minute());
                 else
-                    fprintf(timesFileToWrite,"E %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), dTime.hour(), dTime.minute());
+                    fprintf(timesFileToWrite,"E %d %d %02i:%02i\n", 
+                            node->getNumber(), entrant->getId(), dTime.hour(), 
+                            dTime.minute());
             }
             //Excluded
             if(this->currentState==3){
-                fprintf(timesFileToWrite,"I %d %d %02i:%02i\n", node->getNumber(), entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
+                fprintf(timesFileToWrite,"I %d %d %02i:%02i\n", node->getNumber(), 
+                        entrant->getId(), arrivalTime.hour(), arrivalTime.minute());
             }
             fclose(timesFileToWrite);
 
@@ -282,7 +304,8 @@ Node * CheckpointManager::getNode(int nodeNumber){
 
 //Returns a course pointer from a courseId
 Course * CheckpointManager::getCourse(string courseId){
-    for(vector<Course>::iterator course = courses.begin(); course!=courses.end(); ++course){
+    for(vector<Course>::iterator course = courses.begin();
+            course!=courses.end(); ++course){
         if((*course).getId().compare(courseId)==0)
             return &(*course);
     }
@@ -291,7 +314,8 @@ Course * CheckpointManager::getCourse(string courseId){
 
 //Returns an entrant from an entrantId
 Entrant * CheckpointManager::getEntrant(int id){
-    for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
+    for(vector<Entrant>::iterator entrant = entrants.begin(); 
+            entrant!=entrants.end(); ++entrant){
         if((*entrant).getId()==id)
             return &(*entrant);
     }
@@ -300,7 +324,8 @@ Entrant * CheckpointManager::getEntrant(int id){
 
 //Resets an entrant
 void CheckpointManager::resetEntrants(){
-    for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
+    for(vector<Entrant>::iterator entrant = entrants.begin(); 
+            entrant!=entrants.end(); ++entrant){
         (*entrant).reset();
     }
 }
@@ -308,7 +333,8 @@ void CheckpointManager::resetEntrants(){
 
 //Removes an entrant from the list and comobox when theyre no longer needed
 void CheckpointManager::removeEntrant(int id){
-    for(vector<Entrant>::iterator entrant = entrants.begin(); entrant!=entrants.end(); ++entrant){
+    for(vector<Entrant>::iterator entrant = entrants.begin();
+            entrant!=entrants.end(); ++entrant){
         int entrantId = (*entrant).getId();
         if(entrantId==id){
             ui->inptEntrant->removeItem(ui->inptEntrant->findData(QVariant(entrantId)));
@@ -326,7 +352,8 @@ void CheckpointManager::parseNodesFile(){
     if (!nodesFile){
         QMessageBox msgBox;
          msgBox.setText("Error!");
-         msgBox.setInformativeText("Error parsing nodes file. The program will now exit.");
+         msgBox.setInformativeText("Error parsing nodes file. The "
+         "program will now exit.");
          msgBox.setIcon(QMessageBox::Critical);
          msgBox.exec();
          exit (EXIT_FAILURE);
@@ -354,7 +381,8 @@ void CheckpointManager::parseEntrantsFile(){
     if (!entrantsFile){
         QMessageBox msgBox;
          msgBox.setText("Error!");
-         msgBox.setInformativeText("Error parsing entrants file. The program will now exit.");
+         msgBox.setInformativeText("Error parsing entrants file. The program "
+         "will now exit.");
          msgBox.setIcon(QMessageBox::Critical);
          msgBox.exec();
          exit (EXIT_FAILURE);
@@ -381,7 +409,8 @@ void CheckpointManager::parseCoursesFile(){
     if (!coursesFile){
         QMessageBox msgBox;
          msgBox.setText("Error!");
-         msgBox.setInformativeText("Error parsing courses file. The program will now exit.");
+         msgBox.setInformativeText("Error parsing courses file. The program will "
+         "now exit.");
          msgBox.setIcon(QMessageBox::Critical);
          msgBox.exec();
          exit (EXIT_FAILURE);
@@ -427,7 +456,8 @@ void CheckpointManager::parseTimesFile(){
         if(!newfile.is_open()){
             QMessageBox msgBox;
              msgBox.setText("Error!");
-             msgBox.setInformativeText("Error parsing times file. The program will now exit.");
+             msgBox.setInformativeText("Error parsing times file. The program "
+             "will now exit.");
              msgBox.setIcon(QMessageBox::Critical);
              msgBox.exec();
              exit (EXIT_FAILURE);

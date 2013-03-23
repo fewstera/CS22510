@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="84">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="CheckpointManager" root=".">
+      <df name="NewCheckpointManager.app">
+        <df name="Contents">
+          <df name="MacOS">
+          </df>
+          <df name="Resources">
+          </df>
+        </df>
+      </df>
+      <in>checkpointmanager.cpp</in>
+      <in>checkpointmanager.h</in>
+      <in>course.cpp</in>
+      <in>course.h</in>
+      <in>entrant.cpp</in>
+      <in>entrant.h</in>
+      <in>main.cpp</in>
+      <in>moc_checkpointmanager.cpp</in>
+      <in>node.cpp</in>
+      <in>node.h</in>
+      <in>ui_checkpointmanager.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>CheckpointManager.pro</itemPath>
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+          <ccTool>
+            <incDir>
+              <pElem></pElem>
+              <pElem>.</pElem>
+            </incDir>
+          </ccTool>
+        </makeTool>
+      </makefileType>
+      <item path="checkpointmanager.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem>/Library/Frameworks/QtCore.framework/Headers</pElem>
+            <pElem>/Library/Frameworks/QtGui.framework/Versions/4/Headers</pElem>
+            <pElem>/Library/Frameworks/QtGui.framework/Headers</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>QT_CORE_LIB</Elem>
+            <Elem>QT_GUI_LIB</Elem>
+            <Elem>QT_SHARED</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="course.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>QT_CORE_LIB</Elem>
+            <Elem>QT_GUI_LIB</Elem>
+            <Elem>QT_SHARED</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="entrant.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>QT_CORE_LIB</Elem>
+            <Elem>QT_GUI_LIB</Elem>
+            <Elem>QT_SHARED</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem>/Library/Frameworks/QtCore.framework/Headers</pElem>
+            <pElem>/Library/Frameworks/QtGui.framework/Versions/4/Headers</pElem>
+            <pElem>/Library/Frameworks/QtGui.framework/Headers</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>QT_CORE_LIB</Elem>
+            <Elem>QT_GUI_LIB</Elem>
+            <Elem>QT_SHARED</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="moc_checkpointmanager.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <incDir>
+            <pElem>/Library/Frameworks/QtCore.framework/Headers</pElem>
+            <pElem>/Library/Frameworks/QtGui.framework/Versions/4/Headers</pElem>
+            <pElem>/Library/Frameworks/QtGui.framework/Headers</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>QT_CORE_LIB</Elem>
+            <Elem>QT_GUI_LIB</Elem>
+            <Elem>QT_SHARED</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+      <item path="node.cpp" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>QT_CORE_LIB</Elem>
+            <Elem>QT_GUI_LIB</Elem>
+            <Elem>QT_SHARED</Elem>
+          </preprocessorList>
+        </ccTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
